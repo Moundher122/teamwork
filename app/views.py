@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
 from projectcore import settings
 from django.template.loader import render_to_string
+from django.http import HttpResponse
 class GoogleLoginView(APIView):
     @psa('social:complete')
     def get(self, request, *args, **kwargs):

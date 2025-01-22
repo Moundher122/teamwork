@@ -14,6 +14,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from pandas import crosstab
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +38,15 @@ SIMPLE_JWT = {
 
 ALLOWED_HOSTS = []
 
+
+# Schedule periodic tasks
+CELERY_BEAT_SCHEDULE = {
+    'run-every-30-seconds': {
+        'task': 'app.tasks.test_task',  # Replace 'app' with your Django app name
+        'schedule': 30.0,  # Every 30 seconds
+        # 'args': (arg1, arg2),  # Optional: Pass arguments
+    },
+}
 
 # Application definition
 
@@ -152,4 +162,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True  
 EMAIL_HOST_USER = os.getenv('EMAIL')  
 EMAIL_HOST_PASSWORD = os.getenv('EMAILHOSTPASSWORD')
+
+# settings.py
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'  # Use localhost, not "rabbitmq"
+
 
