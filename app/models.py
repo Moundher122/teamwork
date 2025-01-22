@@ -38,12 +38,12 @@ class User(AbstractBaseUser):
     email = models.EmailField(max_length=100, unique=True)
     password = models.CharField(max_length=100)
     date_joined = models.DateTimeField(auto_now_add=True)
-    objects = MyAccountManager()
     files=models.ManyToManyField("app.file",verbose_name=("files"),null=1)
     admin=models.OneToOneField("app.admin", verbose_name=("admin"), on_delete=models.CASCADE,null=1)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
+    objects = MyAccountManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     class Meta:

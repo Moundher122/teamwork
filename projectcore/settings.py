@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,6 +28,12 @@ SECRET_KEY = 'django-insecure-wtr&3d7-hz!pj5sdtgclo9os01uemwoz@a5g^=me41&nhf91!k
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Access token lifetime
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Refresh token lifetime
+    'ROTATE_REFRESH_TOKENS': True,  # Optionally rotate refresh tokens on refresh
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old tokens after rotation (requires token_blacklist)
+}
 
 ALLOWED_HOSTS = []
 
@@ -38,6 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'social_django',
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
@@ -48,9 +61,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'projectcore.urls'
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 TEMPLATES = [
     {
@@ -80,7 +98,11 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -122,3 +144,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'app.User'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLEKEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLESECRET')
