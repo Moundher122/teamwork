@@ -6,6 +6,9 @@ from . import serlaizer
 from . import models
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.core.mail import send_mail
+from projectcore import settings
+from django.template.loader import render_to_string
 class GoogleLoginView(APIView):
     @psa('social:complete')
     def get(self, request, *args, **kwargs):
@@ -62,8 +65,44 @@ class deleteaccount(APIView):
    def delete(self,request):
       user=request.user
       user.delete()
-      return Response({})
-   
+      return Response({'acount deleted'})
+
+class test(APIView):
+    def post(self,request):
+     subject = 'Custom HTML Email with Styles'
+     message = 'This is a plain text fallback message.'
+     text='wee neeed u'
+    # HTML content with inline CSS for custom styles
+     html_message = f"""
+     <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px;">
+                <h1 style="color: #4CAF50; text-align: center;">{text}</h1>
+                <p style="color: #333333; font-size: 16px; line-height: 1.6;">Thank you for signing up. We are excited to have you on board. Please find more details below:</p>
+                <div style="background-color: #f0f0f0; border-left: 5px solid #4CAF50; padding: 15px; margin-top: 20px;">
+                    <h3 style="color: #333333;">Important Information</h3>
+                    <ul style="color: #333333; list-style-type: none; padding-left: 0;">
+                        <li>Get started by exploring your dashboard.</li>
+                        <li>Check out our documentation for detailed guides.</li>
+                        <li>Contact support if you need any assistance.</li>
+                    </ul>
+                </div>
+                <p style="text-align: center; margin-top: 20px; color: #4CAF50;">Best regards, <br> The Team</p>
+            </div>
+        </body>
+    </html>
+    """
+    
+     from_email = 'bouroumanamoundher@gmail.com'
+     recipient_list = ['bouroumamoundher@gmail.com']
+     send_mail(subject, message, from_email, recipient_list, html_message=html_message)
+
+
+class addfile(APIView):
+   permission_classes=[IsAuthenticated]
+   def post(self,request):
+      pass
+
 
 
 
