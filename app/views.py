@@ -5,6 +5,7 @@ from social_django.utils import psa
 from . import serlaizer
 from . import models
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 class GoogleLoginView(APIView):
     @psa('social:complete')
     def get(self, request, *args, **kwargs):
@@ -55,6 +56,14 @@ class Signin(APIView):
             return Response({'wrong password'})
         except models.User.DoesNotExist:
            return Response({'user DosentExist'})
+
+class deleteaccount(APIView):
+   permission_classes=[IsAuthenticated]
+   def delete(self,request):
+      user=request.user
+      user.delete()
+      return Response({})
+   
 
 
 
