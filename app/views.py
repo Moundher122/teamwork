@@ -1,15 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import Permission
 from social_django.utils import psa
 from . import serlaizer
 from . import models
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.core.mail import send_mail
-from projectcore import settings
-from django.template.loader import render_to_string
-from django.http import HttpResponse
+from . import tasks
 class GoogleLoginView(APIView):
     @psa('social:complete')
     def get(self, request, *args, **kwargs):
@@ -31,6 +30,7 @@ class Login(APIView):
             us.save()
             refresh=RefreshToken.for_user(us)
             access_token=refresh.access_token
+            tasks.sendemail.delay('welcome','welcome to our app','Welcoome to our app',us.email)
             return Response({
                 'user':ser.data,
                 'acess_token':str(access_token),
@@ -102,6 +102,14 @@ class test(APIView):
 class addfile(APIView):
    permission_classes=[IsAuthenticated]
    def post(self,request):
+      ser=serlaizer.fileserlaizer(data=request.data)
+      if ser.is_valid():
+         ser.save(admin=request.user)
+         perm=Permission.objects.get(codename='can_view')
+         request.user.user_permissions.add(perm)
+         return Response({'file added'})
+      return Response(ser.errors,status=status.HTTP_400_BAD_REQUEST)
+   def delete(self,request):
       pass
 
 

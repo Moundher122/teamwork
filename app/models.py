@@ -5,8 +5,11 @@ class file(models.Model):
     name=models.CharField(max_length=100)
     file=models.FileField(upload_to='files/')
     date=models.DateField(auto_now_add=True)
-class admin(models.Model):
-     modifactions=models.JSONField(default=list) 
+    admin=models.ForeignKey("User", verbose_name=("admins"), on_delete=models.DO_NOTHING,null=True)
+
+    def __str__(self):
+        return self.name
+    
 
 class MyAccountManager(BaseUserManager):
     def create_user(self,email,username,password=None):
@@ -33,30 +36,25 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser,PermissionsMixin):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     password = models.CharField(max_length=100)
     date_joined = models.DateTimeField(auto_now_add=True)
-    files=models.ManyToManyField("app.file",verbose_name=("files"),null=1)
-    admin=models.OneToOneField("app.admin", verbose_name=("admin"), on_delete=models.CASCADE,null=1)
+    files=models.ManyToManyField("file",verbose_name=("files"),null=1)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     objects = MyAccountManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+    def __str__(self):      
+        return self.email
     class Meta:
         permissiom:{
             ('can_view','Can view '),
             ('can_change','Can change'),
         }
-    def __str__(self):      
-        return self.email
+    
     def has_perm(self, perm, obj=None):
-        """Check if the user has a specific permission."""
-        return True
-
-    def has_module_perms(self, app_label):
-        """Check if the user has permissions to view the app."""
-        return True
+        return self.is_superuser

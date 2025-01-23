@@ -7,5 +7,6 @@ urlpatterns = [
     path('Login',views.Login.as_view()),
     path('Signin',views.Signin.as_view()),
     path('users',views.deleteaccount.as_view()),
-    path('test',views.test.as_view()),
+    path('File',views.addfile.as_view())
+
 ]
