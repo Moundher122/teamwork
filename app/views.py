@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from social_django.utils import psa
 from . import serlaizer
 from . import models
@@ -105,9 +106,10 @@ class addfile(APIView):
       ser=serlaizer.fileserlaizer(data=request.data)
       if ser.is_valid():
          ser.save(admin=request.user)
-         perm=Permission.objects.get(codename='can_view')
+         content=ContentType.objects.get_for_model(models.User)
+         perm=Permission.objects.get(codename='can_change',content_type=content)
          request.user.user_permissions.add(perm)
-         return Response({'file added'})
+         return Response(ser.data)
       return Response(ser.errors,status=status.HTTP_400_BAD_REQUEST)
    def delete(self,request):
       pass

@@ -51,10 +51,10 @@ class User(AbstractBaseUser,PermissionsMixin):
     def __str__(self):      
         return self.email
     class Meta:
-        permissiom:{
-            ('can_view','Can view '),
-            ('can_change','Can change'),
-        }
+        permissions = (
+            ('can_view', 'Can view'),
+            ('can_change', 'Can change')
+        )
     
     def has_perm(self, perm, obj=None):
-        return self.is_superuser
+     return self.is_superuser or super().has_perm(perm, obj)
